@@ -1,0 +1,18 @@
+{
+  "name": "@retail-media/shared",
+  "version": "1.0.0",
+  "description": "Shared JSON Schemas, TypeScript types, and queue/event contracts used by every service and the web app.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

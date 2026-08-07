@@ -1,0 +1,34 @@
+version: "3.8"
+
+# Local infra only - the four Node services (campaign-api, ad-delivery-api,
+# worker, web) run directly on the host via `npm run dev:*` against these,
+# which is faster to iterate on than rebuilding app containers every change.
+# See README.md for the full local setup.
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # management UI (guest/guest)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  mongo_data:
+  redis_data:
+  rabbitmq_data:

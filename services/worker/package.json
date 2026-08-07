@@ -1,0 +1,24 @@
+{
+  "name": "@retail-media/worker",
+  "version": "1.0.0",
+  "description": "Background processing: a BullMQ worker aggregating ad impression/click events into MongoDB, and a RabbitMQ consumer reacting to campaign lifecycle events.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@retail-media/shared": "^1.0.0",
+    "amqplib": "^0.10.4",
+    "bullmq": "^5.28.1",
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.8.3",
+    "pino": "^9.5.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.5",
+    "@types/node": "^22.9.3",
+    "typescript": "^5.6.3"
+  }
+}
