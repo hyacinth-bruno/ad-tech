@@ -5,6 +5,7 @@ jest.mock("../models/Campaign", () => ({
     create: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
+    distinct: jest.fn(),
   },
 }));
 jest.mock("../lib/rabbitmq", () => ({
@@ -72,6 +73,7 @@ describe("POST /campaigns", () => {
     expect(res.status).toBe(201);
     expect(res.body._id).toBe("cmp_123");
     expect(CampaignModel.create).toHaveBeenCalledTimes(1);
+    expect(CampaignModel.create).toHaveBeenCalledWith(expect.objectContaining({ status: "draft" }));
     expect(publishEvent).toHaveBeenCalledWith(
       "campaign.created",
       expect.objectContaining({ campaignId: "cmp_123", productSku: "ACME-PROT-001" })
@@ -90,6 +92,22 @@ describe("POST /campaigns", () => {
     expect(res.status).toBe(201);
     expect(res.body._id).toBe("cmp_456");
   });
+
+  it.each(["draft", "active", "paused", "ended"])("creates a campaign directly in the chosen %s state", async (status) => {
+    (CampaignModel.create as jest.Mock).mockImplementationOnce(async (data) => ({ _id: "cmp_status", ...data }));
+    const response = await request(createApp()).post("/campaigns").send({ ...validPayload, status });
+    expect(response.status).toBe(201);
+    expect(response.body.status).toBe(status);
+    expect(CampaignModel.create).toHaveBeenCalledWith(expect.objectContaining({ status }));
+    expect(indexCampaign).toHaveBeenCalledWith(expect.objectContaining({ status }));
+  });
+
+  it("rejects an unsupported initial status before saving", async () => {
+    const response = await request(createApp()).post("/campaigns").send({ ...validPayload, status: "scheduled" });
+    expect(response.status).toBe(422);
+    expect(response.body.fields).toHaveProperty("status");
+    expect(CampaignModel.create).not.toHaveBeenCalled();
+  });
 });
 
 describe("GET /campaigns/:id", () => {
@@ -101,4 +119,12 @@ describe("GET /campaigns/:id", () => {
     const res = await request(app).get("/campaigns/does-not-exist");
     expect(res.status).toBe(404);
   });
+});
+
+it("suggests sorted categories from all active campaigns without treating categories as an ID", async () => {
+  (CampaignModel.distinct as jest.Mock).mockResolvedValue(["Headphones", "Audio"]);
+  const response = await request(createApp()).get("/campaigns/categories");
+  expect(response.status).toBe(200);
+  expect(response.body).toEqual(["Audio", "Headphones"]);
+  expect(CampaignModel.distinct).toHaveBeenCalledWith("targeting.categories", { status: "active" });
 });

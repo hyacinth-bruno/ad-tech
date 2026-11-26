@@ -1,12 +1,14 @@
 import { Stack, Typography } from "@mui/material";
 import { FormField } from "@/components/FormField";
+import { ProductPicker } from "./ProductPicker";
 
 export function StepBasics() {
   return (
     <Stack gap={3}>
       <Typography variant="body2" color="text.secondary">
-        Who's advertising, and what product is this sponsored listing for.
+        Choose a catalog product to fill the details, or introduce a product of your own.
       </Typography>
+      <ProductPicker />
       <FormField name="advertiserName" label="Advertiser name" placeholder="Acme Supplements" />
       <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
         <FormField name="productSku" label="Product SKU" placeholder="ACME-PROT-001" helperText="Letters, numbers, - and _ only" />

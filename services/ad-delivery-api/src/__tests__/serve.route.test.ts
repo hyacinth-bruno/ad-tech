@@ -26,6 +26,7 @@ afterAll(async () => {
 const candidateA = {
   objectID: "cmp_a",
   productName: "Whey Protein 1kg",
+  productSku: "BB-1234",
   headline: "Fuel your workouts",
   bodyCopy: "25g protein per serving.",
   destinationUrl: "https://shop.example.com/whey",
@@ -57,6 +58,7 @@ describe("GET /serve", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.campaignId).toBe("cmp_a");
+    expect(res.body.productSku).toBe("BB-1234");
     expect(enqueueAdEvent).toHaveBeenCalledWith(
       "impression",
       expect.objectContaining({ campaignId: "cmp_a", userId: "user_1", placement: "pdp" })

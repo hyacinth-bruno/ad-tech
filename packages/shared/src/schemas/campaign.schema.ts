@@ -26,6 +26,7 @@ export const CAMPAIGN_JSON_SCHEMA = {
     "schedule",
   ],
   properties: {
+    status: { type: "string", enum: ["draft", "active", "paused", "ended"], default: "draft" },
     advertiserName: { type: "string", minLength: 2, maxLength: 80 },
     productSku: { type: "string", pattern: "^[A-Za-z0-9_-]{3,32}$" },
     productName: { type: "string", minLength: 2, maxLength: 120 },
@@ -91,6 +92,7 @@ export type Placement = "search" | "category" | "pdp";
 export type CampaignStatus = "draft" | "active" | "paused" | "ended";
 
 export interface CampaignInput {
+  status?: CampaignStatus;
   advertiserName: string;
   productSku: string;
   productName: string;

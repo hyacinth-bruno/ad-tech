@@ -36,6 +36,9 @@ test('MCP discovery, image upload, draft creation and API errors over stdio', as
     const created = await client.callTool({ name: 'create_ad', arguments: { campaign: { headline: 'Photo campaign', imageUrl: `${base}/assets/photo.png` } } });
     assert.equal(JSON.parse(created.content[0].text).campaign.status, 'draft');
     assert.equal(JSON.parse(requests.find(r => r.url === '/campaigns').body).headline, 'Photo campaign');
+    const requestedActive = await client.callTool({ name: 'create_ad', arguments: { campaign: { headline: 'Still a draft', status: 'active' } } });
+    assert.equal(JSON.parse(requestedActive.content[0].text).campaign.status, 'draft');
+    assert.equal(JSON.parse(requests.filter(r => r.url === '/campaigns').at(-1).body).status, 'draft');
     assert.equal((await client.callTool({ name: 'list_campaigns', arguments: {} })).isError, true);
     assert.equal((await client.callTool({ name: 'upload_image', arguments: { filePath: new URL('../package.json', import.meta.url).pathname } })).isError, true);
     assert.equal((await client.callTool({ name: 'set_ad_status', arguments: { id: '../bad', status: 'active' } })).isError, true);

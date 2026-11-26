@@ -2,6 +2,14 @@ import { Stack, Typography, Divider, Chip, Box } from "@mui/material";
 import { useFormikContext } from "formik";
 import type { CampaignInput } from "@retail-media/shared";
 import { monoFont } from "@/lib/theme";
+import { FormField } from "@/components/FormField";
+
+const statusDescriptions = {
+  active: "The campaign will be active and eligible for matching ad placements.",
+  draft: "Save for later review. Ads won’t serve until you activate the campaign.",
+  paused: "Create the campaign on hold. Ads won’t serve until you activate it.",
+  ended: "Create the campaign as ended. Ads won’t serve unless you reactivate it.",
+};
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -9,7 +17,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="body2" sx={{ textAlign: "right" }}>
+      <Typography variant="body2" sx={{ textAlign: "right", overflowWrap: "anywhere", minWidth: 0 }}>
         {value}
       </Typography>
     </Stack>
@@ -17,19 +25,19 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export function StepReview() {
-  const { values } = useFormikContext<CampaignInput>();
+  const { values, isSubmitting } = useFormikContext<CampaignInput>();
 
   return (
     <Stack gap={2}>
       <Typography variant="body2" color="text.secondary">
-        Confirm before this goes to campaign-api, gets indexed in Algolia, and becomes eligible for serving.
+        One last look. Review the details and choose the campaign’s initial status.
       </Typography>
 
       <Box sx={{ p: 2.5, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
         <Typography variant="overline" sx={{ fontFamily: monoFont, letterSpacing: 1 }}>
           {values.productSku || "SKU"}
         </Typography>
-        <Typography variant="h6">{values.headline || "(headline)"}</Typography>
+        <Typography variant="h6" component="h3">{values.headline || "(headline)"}</Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           {values.bodyCopy || "(body copy)"}
         </Typography>
@@ -44,6 +52,14 @@ export function StepReview() {
       </Box>
 
       <Divider />
+
+      <FormField name="status" label="Initial campaign status" select disabled={isSubmitting}
+        SelectProps={{ native: true }} helperText={statusDescriptions[values.status ?? "draft"]}>
+        <option value="draft">Draft</option>
+        <option value="active">Active</option>
+        <option value="paused">Paused</option>
+        <option value="ended">Ended</option>
+      </FormField>
 
       <Row label="Advertiser" value={values.advertiserName} />
       <Row label="Product" value={values.productName} />

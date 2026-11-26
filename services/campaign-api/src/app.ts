@@ -5,6 +5,8 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import { logger } from "./lib/logger";
 import { campaignsRouter } from "./routes/campaigns";
+import { productsRouter } from "./routes/products";
+import { storefrontRouter } from "./routes/storefront";
 
 export function createApp(): Express {
   const app = express();
@@ -17,6 +19,8 @@ export function createApp(): Express {
   app.use("/assets", assetsRouter);
   app.use("/assets", express.static(assetDirectory, { dotfiles: "deny", index: false, setHeaders: (res) => { res.setHeader("X-Content-Type-Options", "nosniff"); } }));
   app.use("/campaigns", campaignsRouter);
+  app.use("/products", productsRouter);
+  app.use("/store", storefrontRouter);
 
   return app;
 }

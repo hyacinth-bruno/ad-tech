@@ -31,7 +31,7 @@ export async function callTool(name, args = {}) {
   if (name === 'list_campaigns') return request('/campaigns');
   if (name === 'create_ad') {
     if (!args.campaign || typeof args.campaign !== 'object' || Array.isArray(args.campaign)) throw new Error('campaign object is required');
-    const campaign = await request('/campaigns', 'POST', args.campaign);
+    const campaign = await request('/campaigns', 'POST', { ...args.campaign, status: 'draft' });
     return { campaign, browserUrl: web.href, message: 'Saved as a draft. Dashboard refreshes within five seconds.' };
   }
   if (name === 'set_ad_status') {

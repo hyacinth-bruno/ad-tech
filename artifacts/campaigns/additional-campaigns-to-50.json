@@ -1,0 +1,593 @@
+[
+  {
+    "scenario": "Demo 28",
+    "title": "Portable Bluetooth speaker",
+    "useCase": "Catalog product discovery across search, category placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-7401097",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-7401097",
+    "storefrontUrl": "http://localhost:3000/shop?category=Audio&q=speaker",
+    "campaign": {
+      "advertiserName": "iHome",
+      "productSku": "BB-7401097",
+      "productName": "iHome - Bluetooth Speaker - Black",
+      "headline": "[Demo 28] Portable Bluetooth speaker",
+      "bodyCopy": "Explore iHome - Bluetooth Speaker - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/7401097_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-7401097",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Audio"
+        ],
+        "keywords": [
+          "speaker",
+          "bluetooth"
+        ],
+        "placements": [
+          "search",
+          "category"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089d9296dc90c47cfed7cd",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 29",
+    "title": "DSLR camera discovery",
+    "useCase": "Catalog product discovery across search, category, pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-4826999",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4826999",
+    "storefrontUrl": "http://localhost:3000/shop?category=Cameras+%26+Camcorders&q=Nikon",
+    "campaign": {
+      "advertiserName": "Nikon",
+      "productSku": "BB-4826999",
+      "productName": "Nikon - D3200 DSLR Camera with 18-55mm VR Lens - Black",
+      "headline": "[Demo 29] DSLR camera discovery",
+      "bodyCopy": "Explore Nikon - D3200 DSLR Camera with 18-55mm VR Lens - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/4826999_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4826999",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Cameras & Camcorders",
+          "Digital Cameras",
+          "Digital SLR Cameras",
+          "DSLR Body & Lens"
+        ],
+        "keywords": [
+          "Nikon",
+          "camera",
+          "DSLR"
+        ],
+        "placements": [
+          "search",
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089d9896dc90c47cfed7d2",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 30",
+    "title": "Smartwatch on product pages",
+    "useCase": "Catalog product discovery across pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-4457700",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4457700",
+    "storefrontUrl": "http://localhost:3000/shop?category=Cell+Phones",
+    "campaign": {
+      "advertiserName": "Huawei",
+      "productSku": "BB-4457700",
+      "productName": "Huawei - Smartwatch 42mm Stainless Steel - Black Stainless Steel",
+      "headline": "[Demo 30] Smartwatch on product pages",
+      "bodyCopy": "Explore Huawei - Smartwatch 42mm Stainless Steel - Black Stainless Steel. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/4457700_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4457700",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Cell Phones",
+          "Cell Phone Accessories",
+          "Smartwatches & Accessories",
+          "Smartwatches"
+        ],
+        "keywords": [],
+        "placements": [
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089d9e96dc90c47cfed7d7",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 31",
+    "title": "External storage discovery",
+    "useCase": "Catalog product discovery across category, pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-2240021",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-2240021",
+    "storefrontUrl": "http://localhost:3000/shop?category=Computers+%26+Tablets",
+    "campaign": {
+      "advertiserName": "G-Technology",
+      "productSku": "BB-2240021",
+      "productName": "G-Technology - G-DRIVE (Gen 6) 2TB External USB 3.0/2.0, FireWire 800 and eSATA Hard Drive - Silver",
+      "headline": "[Demo 31] External storage discovery",
+      "bodyCopy": "Explore G-Technology - G-DRIVE (Gen 6) 2TB External USB 3.0/2.0, FireWire 800 and eSATA Hard Drive - Silver. View the product details and add it to your demo ba",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/2240021_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-2240021",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Computers & Tablets",
+          "Hard Drives & Storage",
+          "External Hard Drives"
+        ],
+        "keywords": [],
+        "placements": [
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089da296dc90c47cfed7dc",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 32",
+    "title": "Solid-state storage in search",
+    "useCase": "Catalog product discovery across search placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-3076048",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-3076048",
+    "storefrontUrl": "http://localhost:3000/shop?category=Computers+%26+Tablets&q=SSD",
+    "campaign": {
+      "advertiserName": "SanDisk",
+      "productSku": "BB-3076048",
+      "productName": "SanDisk - SSD Plus 120GB Internal Serial ATA Solid State Drive - Black",
+      "headline": "[Demo 32] Solid-state storage in search",
+      "bodyCopy": "Explore SanDisk - SSD Plus 120GB Internal Serial ATA Solid State Drive - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/3076048_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-3076048",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Computers & Tablets",
+          "Hard Drives & Storage",
+          "Solid State Drives"
+        ],
+        "keywords": [
+          "SSD",
+          "SanDisk",
+          "solid state drive"
+        ],
+        "placements": [
+          "search"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089da996dc90c47cfed7e2",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 33",
+    "title": "USB flash drive essentials",
+    "useCase": "Catalog product discovery across search, category placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-5597704",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-5597704",
+    "storefrontUrl": "http://localhost:3000/shop?category=Computers+%26+Tablets&q=USB",
+    "campaign": {
+      "advertiserName": "SanDisk",
+      "productSku": "BB-5597704",
+      "productName": "SanDisk - Cruzer Fit 32GB USB Flash Drive - Black",
+      "headline": "[Demo 33] USB flash drive essentials",
+      "bodyCopy": "Explore SanDisk - Cruzer Fit 32GB USB Flash Drive - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/5597704_rb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-5597704",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Computers & Tablets",
+          "USB Flash Drives"
+        ],
+        "keywords": [
+          "USB",
+          "flash drive",
+          "SanDisk"
+        ],
+        "placements": [
+          "search",
+          "category"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089dae96dc90c47cfed7e7",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 34",
+    "title": "Wireless earbuds discovery",
+    "useCase": "Catalog product discovery across search, category, pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-7251027",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-7251027",
+    "storefrontUrl": "http://localhost:3000/shop?category=Audio&q=earbuds",
+    "campaign": {
+      "advertiserName": "Jabra",
+      "productSku": "BB-7251027",
+      "productName": "Jabra - Sport Coach Wireless Sports Earbuds - Blue",
+      "headline": "[Demo 34] Wireless earbuds discovery",
+      "bodyCopy": "Explore Jabra - Sport Coach Wireless Sports Earbuds - Blue. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/7251027_rb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-7251027",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Audio",
+          "Headphones",
+          "Earbud & In-Ear Headphones"
+        ],
+        "keywords": [
+          "earbuds",
+          "Jabra",
+          "wireless"
+        ],
+        "placements": [
+          "search",
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089db896dc90c47cfed7ed",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 35",
+    "title": "Soundbar category discovery",
+    "useCase": "Catalog product discovery across category placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-2903538",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-2903538",
+    "storefrontUrl": "http://localhost:3000/shop?category=Audio",
+    "campaign": {
+      "advertiserName": "Denon",
+      "productSku": "BB-2903538",
+      "productName": "Denon - Soundbar with Wireless Subwoofer - Black",
+      "headline": "[Demo 35] Soundbar category discovery",
+      "bodyCopy": "Explore Denon - Soundbar with Wireless Subwoofer - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/2903538_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-2903538",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Audio",
+          "Home Audio",
+          "Home Theater Systems",
+          "Sound Bars"
+        ],
+        "keywords": [],
+        "placements": [
+          "category"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089dbe96dc90c47cfed7f2",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 36",
+    "title": "Compact microwave discovery",
+    "useCase": "Catalog product discovery across category, pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-1508022",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1508022",
+    "storefrontUrl": "http://localhost:3000/shop?category=Appliances",
+    "campaign": {
+      "advertiserName": "Avanti",
+      "productSku": "BB-1508022",
+      "productName": "Avanti - 0.7 Cu. Ft. Compact Microwave - Black/Stainless Steel",
+      "headline": "[Demo 36] Compact microwave discovery",
+      "bodyCopy": "Explore Avanti - 0.7 Cu. Ft. Compact Microwave - Black/Stainless Steel. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/1508022_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1508022",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Appliances",
+          "Microwaves",
+          "Countertop Microwaves"
+        ],
+        "keywords": [],
+        "placements": [
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089dc396dc90c47cfed7f7",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 37",
+    "title": "Blender across all placements",
+    "useCase": "Catalog product discovery across search, category, pdp placements, with a local product-page destination.",
+    "intendedStatus": "active",
+    "productId": "algolia-bestbuy-1013848",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1013848",
+    "storefrontUrl": "http://localhost:3000/shop?category=Appliances&q=blender",
+    "campaign": {
+      "advertiserName": "Magic Bullet",
+      "productSku": "BB-1013848",
+      "productName": "Magic Bullet - Blender - Black",
+      "headline": "[Demo 37] Blender across all placements",
+      "bodyCopy": "Explore Magic Bullet - Blender - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/1013848_rb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1013848",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Appliances",
+          "Small Kitchen Appliances",
+          "Blenders & Juicers",
+          "Blenders",
+          "Single-Serve Blenders"
+        ],
+        "keywords": [
+          "blender",
+          "Magic Bullet"
+        ],
+        "placements": [
+          "search",
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089dca96dc90c47cfed7fc",
+    "savedStatus": "active"
+  },
+  {
+    "scenario": "Demo 38",
+    "title": "Fitness tracker draft review",
+    "useCase": "Draft campaign example; excluded from ad serving until activated.",
+    "intendedStatus": "draft",
+    "productId": "algolia-bestbuy-4273700",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4273700",
+    "storefrontUrl": "http://localhost:3000/shop?category=Health%2C+Fitness+%26+Beauty&q=fitness+tracker",
+    "campaign": {
+      "advertiserName": "Moov",
+      "productSku": "BB-4273700",
+      "productName": "Moov - Fitness Tracker - Black",
+      "headline": "[Demo 38] Fitness tracker draft review",
+      "bodyCopy": "Explore Moov - Fitness Tracker - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/4273700_rb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-4273700",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Health, Fitness & Beauty"
+        ],
+        "keywords": [
+          "fitness tracker",
+          "Moov"
+        ],
+        "placements": [
+          "search",
+          "category"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089dda96dc90c47cfed803",
+    "savedStatus": "draft"
+  },
+  {
+    "scenario": "Demo 39",
+    "title": "Gaming headset on hold",
+    "useCase": "Paused campaign example; excluded from ad serving until activated.",
+    "intendedStatus": "paused",
+    "productId": "algolia-bestbuy-1388362",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1388362",
+    "storefrontUrl": "http://localhost:3000/shop?category=Video+Games&q=gaming+headset",
+    "campaign": {
+      "advertiserName": "Logitech",
+      "productSku": "BB-1388362",
+      "productName": "Logitech - G930 Wireless Gaming Headset - Black",
+      "headline": "[Demo 39] Gaming headset on hold",
+      "bodyCopy": "Explore Logitech - G930 Wireless Gaming Headset - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/1388362_rb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-1388362",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Video Games",
+          "Video Game Accessories",
+          "Gaming Headsets"
+        ],
+        "keywords": [
+          "gaming headset",
+          "Logitech"
+        ],
+        "placements": [
+          "search",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089ddd96dc90c47cfed806",
+    "savedStatus": "paused"
+  },
+  {
+    "scenario": "Demo 40",
+    "title": "Webcam campaign ended",
+    "useCase": "Ended campaign example; excluded from ad serving until activated.",
+    "intendedStatus": "ended",
+    "productId": "algolia-bestbuy-9926783",
+    "productUrl": "http://localhost:3000/shop/products/algolia-bestbuy-9926783",
+    "storefrontUrl": "http://localhost:3000/shop?category=Computers+%26+Tablets&q=webcam",
+    "campaign": {
+      "advertiserName": "Logitech",
+      "productSku": "BB-9926783",
+      "productName": "Logitech - C310 Webcam - Black",
+      "headline": "[Demo 40] Webcam campaign ended",
+      "bodyCopy": "Explore Logitech - C310 Webcam - Black. View the product details and add it to your demo bag.",
+      "imageUrl": "https://cdn-demo.algolia.com/bestbuy/9926783_sb.jpg",
+      "destinationUrl": "http://localhost:3000/shop/products/algolia-bestbuy-9926783",
+      "budget": {
+        "dailyCapCents": 1000,
+        "totalCapCents": 30000
+      },
+      "targeting": {
+        "categories": [
+          "Computers & Tablets",
+          "Webcams",
+          "All Webcams"
+        ],
+        "keywords": [
+          "webcam",
+          "Logitech"
+        ],
+        "placements": [
+          "search",
+          "category",
+          "pdp"
+        ]
+      },
+      "frequencyCap": {
+        "impressionsPerUserPerDay": 3
+      },
+      "schedule": {
+        "startDate": "2026-11-26",
+        "endDate": "2026-12-26"
+      }
+    },
+    "id": "6b089de296dc90c47cfed80b",
+    "savedStatus": "ended"
+  }
+]
