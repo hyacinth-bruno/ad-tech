@@ -32,7 +32,7 @@ export const CAMPAIGN_JSON_SCHEMA = {
     headline: { type: "string", minLength: 5, maxLength: 60 },
     bodyCopy: { type: "string", minLength: 10, maxLength: 160 },
     destinationUrl: { type: "string", format: "uri" },
-    imageUrl: { type: "string", format: "uri" },
+    imageUrl: { type: "string", anyOf: [{ maxLength: 0 }, { format: "uri" }] },
     budget: {
       type: "object",
       additionalProperties: false,
