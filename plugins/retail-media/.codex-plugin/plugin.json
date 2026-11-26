@@ -1,0 +1,7 @@
+{
+  "name": "retail-media",
+  "version": "0.1.0",
+  "description": "Create retail ads from photos and prompts in Codex.",
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}

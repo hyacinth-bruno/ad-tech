@@ -17,9 +17,18 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    listCampaigns()
-      .then(setCampaigns)
-      .catch(() => setError("Couldn't reach campaign-api. Is it running on :4001? See README for docker-compose up."));
+    let disposed = false;
+    const refresh = async () => {
+      try {
+        const rows = await listCampaigns();
+        if (!disposed) { setCampaigns(rows); setError(null); }
+      } catch {
+        if (!disposed) setError("Couldn't reach campaign-api. Is it running on :4001? See README for docker-compose up.");
+      }
+    };
+    void refresh();
+    const timer = window.setInterval(refresh, 5000);
+    return () => { disposed = true; window.clearInterval(timer); };
   }, []);
 
   return (
@@ -28,7 +37,7 @@ export default function DashboardPage() {
         <Stack gap={0.5}>
           <Typography variant="h4">Campaigns</Typography>
           <Typography variant="body2" color="text.secondary">
-            Every row here is a MongoDB document, indexed in Algolia the moment it's active.
+            Ads created in Codex appear here automatically. Drafts are ready for review.
           </Typography>
         </Stack>
         <Link href="/campaigns/new" passHref legacyBehavior>
@@ -56,6 +65,7 @@ export default function DashboardPage() {
         {campaigns?.map((c) => (
           <Card key={c.id ?? (c as unknown as { _id: string })._id}>
             <CardContent>
+              {c.imageUrl ? <Box component="img" src={c.imageUrl} alt={c.productName} sx={{ width: 120, height: 100, objectFit: "contain", mb: 2 }} /> : null}
               <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                 <Stack gap={0.5}>
                   <Typography variant="caption" sx={{ fontFamily: monoFont, color: "text.secondary" }}>
@@ -67,6 +77,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     {c.advertiserName} · {c.productName}
                   </Typography>
+                  <Typography variant="body2">{c.bodyCopy}</Typography>
                   <Stack direction="row" gap={0.5} flexWrap="wrap" sx={{ mt: 0.5 }}>
                     {c.targeting?.categories?.map((cat) => (
                       <Chip key={cat} label={cat} size="small" variant="outlined" color="secondary" />

@@ -117,3 +117,52 @@ covers that, or a local `redis-server`.
 - The worker's RabbitMQ consumer currently just logs; in production it's
   where you'd hang cache warming, Slack notifications for high-budget
   launches, or a search-index consistency check.
+
+### Create ads from photos in Codex (no Claude key)
+
+The local plugin in `plugins/retail-media` lets Codex write copy itself and save
+campaigns through MCP. This workflow does not call Anthropic or require an OpenAI
+API key in the app; it uses your existing Codex session. The older website AI-copy
+button still uses the optional Anthropic integration.
+
+1. Start the demo services using the instructions above, including campaign-api
+   on port 4001 and the website on port 3000.
+2. Install the plugin dependency:
+   `npm ci --prefix plugins/retail-media --ignore-scripts`.
+3. Connect the local server to Codex (replace both absolute paths):
+
+   ```sh
+   codex mcp add retail-media --env RETAIL_MEDIA_UPLOAD_DIR=/absolute/path/to/photos -- node /absolute/path/to/retail-media-demo/plugins/retail-media/server/index.mjs
+   ```
+
+   The directory limits which local photos the tool can read. Choose the folder
+   containing your attachments, or copy photos into a dedicated project folder.
+   Optional server environment variables: `RETAIL_MEDIA_API_URL` and
+   `RETAIL_MEDIA_WEB_URL` (defaults `http://localhost:4001` and
+   `http://localhost:3000`). This bridge supports loopback URLs only because the
+   demo API has no authentication. Keep the demo services private.
+4. Use the workflow instructions in
+   `plugins/retail-media/skills/create-ad/SKILL.md`, or load the full plugin from
+   that directory through a local plugin marketplace. Portable `plugin.json`,
+   `mcp.json` and a Codex compatibility manifest are included. The MCP-only
+   connection above exposes the tools without installing the packaged skill.
+5. Attach a photo and prompt Codex, for example:
+   “Use the retail-media tools to create a draft ad for these trainers. Acme,
+   SKU TRAIN-001, destination https://shop.example.com/trainers, premium tone,
+   running category, search placement. Daily budget €10, total budget €100,
+   December 1–10, 2026, frequency cap 3. Use my attached photo.”
+
+Codex retrieves the current campaign schema, uploads the photo and saves the ad.
+If an attachment has no readable local path, supply its local path. The dashboard
+refreshes every five seconds and shows draft photos and copy. Ask Codex to
+activate a saved ad when it should be published; active ads enter the existing
+ad-delivery flow. The API validates campaign fields with the shared schema.
+
+Images are limited to PNG, JPEG or WebP, up to 5 MiB, with signature checks.
+They are stored under generated filenames in `data/assets` relative to the
+campaign-api process working directory (override with `ASSET_DIRECTORY`), and
+served at `/assets/...`. Preserve this directory to retain photos after restarts;
+it is excluded from Git. There is no automatic image deletion or cloud storage.
+
+Verify the bridge with `npm test --prefix plugins/retail-media`; run the API tests
+with `npm test -w services/campaign-api`.

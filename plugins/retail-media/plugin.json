@@ -1,0 +1,7 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "retail-media",
+  "version": "0.1.0",
+  "description": "Create retail ads from photos and prompts in Codex, then save them to the local browser app.",
+  "author": { "name": "Retail Media Demo" }
+}
