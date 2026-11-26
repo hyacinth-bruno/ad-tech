@@ -10,6 +10,26 @@ const client = appId && adminKey ? algoliasearch(appId, adminKey) : null;
 const index = client?.initIndex(indexName) ?? null;
 
 /**
+ * Algolia rejects filters/facetFilters on any attribute not declared as
+ * filterable at the index-settings level - it's not enough for the
+ * attribute to just be present on indexed records. ad-delivery-api's
+ * /serve route filters on status, categories, and placements, so those
+ * have to be declared here. Called once on startup rather than left as a
+ * manual Algolia dashboard step, to keep this config-as-code like the rest
+ * of the campaign schema.
+ */
+export async function configureIndex(): Promise<void> {
+  if (!index) {
+    logger.warn("Algolia not configured (ALGOLIA_APP_ID / ALGOLIA_ADMIN_API_KEY missing) - skipping index settings");
+    return;
+  }
+  await index.setSettings({
+    attributesForFaceting: ["status", "categories", "placements"],
+  });
+  logger.info("configured Algolia filterable attributes");
+}
+
+/**
  * Mirrors an active campaign into Algolia so ad-delivery-api can do
  * sub-50ms "best matching campaign for this category/keyword" lookups
  * instead of hitting MongoDB on the hot request path. Called after every
