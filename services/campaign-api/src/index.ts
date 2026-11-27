@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { createApp } from "./app";
 import { logger } from "./lib/logger";
 import { configureIndex } from "./lib/algolia";
+import { StoreEventModel, StoreOrderModel } from "./models/StoreEvent";
 
 const PORT = Number(process.env.PORT ?? 4001);
 const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://localhost:27017/retail_media";
@@ -10,6 +11,8 @@ const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://localhost:27017/retail
 async function main() {
   await mongoose.connect(MONGODB_URI);
   logger.info("connected to MongoDB");
+  // Idempotent event/order writes rely on these unique indexes from the first request.
+  await Promise.all([StoreEventModel.init(), StoreOrderModel.init()]);
 
   await configureIndex();
 

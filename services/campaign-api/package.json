@@ -1,16 +1,17 @@
 {
   "name": "@retail-media/campaign-api",
   "version": "1.0.0",
-  "description": "Campaign CRUD microservice: validates against the shared JSON Schema, persists to MongoDB, publishes domain events to RabbitMQ, indexes searchable campaign fields to Algolia, and offers an AI ad-copy suggestion endpoint.",
+  "description": "Campaign and storefront API: shared JSON Schema validation, MongoDB persistence, catalog search, Algolia indexing, and RabbitMQ campaign events.",
   "main": "dist/index.js",
   "scripts": {
+    "setup:storefront": "npm run build && node dist/scripts/setupStorefront.js",
+    "import:products": "npm run build && node dist/scripts/importProducts.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1",
     "@retail-media/shared": "^1.0.0",
     "algoliasearch": "^4.24.0",
     "amqplib": "^0.10.4",

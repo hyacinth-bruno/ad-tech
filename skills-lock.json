@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "instantsearch": {
+      "source": "algolia/skills",
+      "commit": "476d5c32dd249940ab7a7ded3330d9cfb0199ac3",
+      "sourceType": "github",
+      "skillPath": "skills/instantsearch/SKILL.md",
+      "computedHash": "221fdafd3e1ffb0dc0f2c105a84d965d8c8e1bcd09ebb4b1e2bcfe370c985727"
+    }
+  }
+}

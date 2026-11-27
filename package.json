@@ -2,19 +2,26 @@
   "name": "retail-media-demo",
   "private": true,
   "version": "1.0.0",
-  "description": "Retail Media / AdTech demo: campaign builder -> live ad delivery, with AI-assisted creative copy.",
+  "description": "Retail Media / AdTech demo: catalog-backed campaign builder and live ad delivery.",
   "workspaces": [
     "packages/*",
     "services/*",
     "apps/*"
   ],
   "scripts": {
+    "setup:storefront": "npm run build:shared && node scripts/with-keychain.mjs campaign-api -- npm run setup:storefront -w services/campaign-api",
+    "import:products": "npm run build:shared && node scripts/with-keychain.mjs campaign-api -- npm run import:products -w services/campaign-api --",
     "build:shared": "npm run build -w packages/shared",
-    "dev:campaign-api": "npm run dev -w services/campaign-api",
-    "dev:ad-delivery-api": "npm run dev -w services/ad-delivery-api",
-    "dev:worker": "npm run dev -w services/worker",
-    "dev:web": "npm run dev -w apps/web",
-    "test": "npm run test -w services/campaign-api && npm run test -w services/ad-delivery-api"
+    "dev:campaign-api": "node scripts/with-keychain.mjs campaign-api -- npm run dev -w services/campaign-api",
+    "dev:ad-delivery-api": "node scripts/with-keychain.mjs ad-delivery-api -- npm run dev -w services/ad-delivery-api",
+    "dev:worker": "node scripts/with-keychain.mjs worker -- npm run dev -w services/worker",
+    "dev:web": "node scripts/with-keychain.mjs web -- npm run dev -w apps/web",
+    "test": "npm run test -w services/campaign-api && npm run test -w services/ad-delivery-api",
+    "test:a11y": "npm run test:a11y -w apps/web",
+    "build:web": "node scripts/with-keychain.mjs web -- npm run build -w apps/web",
+    "secrets:store": "node scripts/store-secrets.mjs",
+    "secrets:status": "node scripts/secrets-status.mjs",
+    "test:secrets": "node --test scripts/keychain.test.mjs"
   },
   "engines": {
     "node": ">=20"

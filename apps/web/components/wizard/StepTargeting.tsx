@@ -1,4 +1,4 @@
-import { Stack, Typography, Autocomplete, TextField, FormGroup, FormControlLabel, Checkbox, FormHelperText } from "@mui/material";
+import { Stack, Typography, Autocomplete, TextField, FormGroup, FormControlLabel, Checkbox, FormHelperText, FormControl, FormLabel } from "@mui/material";
 import { useField, useFormikContext } from "formik";
 import { FormField } from "@/components/FormField";
 import type { CampaignInput, Placement } from "@retail-media/shared";
@@ -14,6 +14,8 @@ function TagsField({ name, label, placeholder }: { name: string; label: string; 
   return (
     <Autocomplete
       multiple
+      disablePortal
+      id={`field-${name.replace(/[^a-zA-Z0-9]/g, "-")}`}
       freeSolo
       options={[]}
       value={field.value ?? []}
@@ -22,6 +24,8 @@ function TagsField({ name, label, placeholder }: { name: string; label: string; 
       renderInput={(params) => (
         <TextField
           {...params}
+          name={name}
+          required={name === "targeting.categories"}
           label={label}
           placeholder={placeholder}
           error={Boolean(meta.touched && meta.error)}
@@ -43,19 +47,17 @@ export function StepTargeting() {
   }
 
   return (
-    <Stack gap={3}>
+    <Stack gap={3} sx={{ "& .MuiFormControlLabel-root": { border: "1px solid", borderColor: "divider", borderRadius: 2, px: 1, py: 0.5, ml: 0, mr: 1, mb: 1 }, "& .MuiFormControlLabel-label": { fontSize: 12 } }}>
       <Typography variant="body2" color="text.secondary">
-        Where this ad is eligible to show, and the spend / frequency limits enforced on the serving path.
+        Choose where your product can be discovered, then set your budget, dates and daily frequency cap.
       </Typography>
 
       <TagsField name="targeting.categories" label="Categories" placeholder="sports-nutrition" />
       <TagsField name="targeting.keywords" label="Keywords (optional)" placeholder="protein, whey" />
 
-      <Stack>
-        <Typography variant="subtitle2" gutterBottom>
-          Placements
-        </Typography>
-        <FormGroup row onBlur={handleBlur}>
+      <FormControl component="fieldset" id="field-targeting-placements" error={Boolean(placementError)}>
+        <FormLabel component="legend" sx={{ fontSize: 13, mb: 1 }}>Placements (choose at least one)</FormLabel>
+        <FormGroup row onBlur={handleBlur} aria-describedby={placementError ? "placement-error" : undefined}>
           {PLACEMENT_OPTIONS.map((opt) => (
             <FormControlLabel
               key={opt.value}
@@ -70,8 +72,8 @@ export function StepTargeting() {
             />
           ))}
         </FormGroup>
-        {placementError ? <FormHelperText error>{placementError}</FormHelperText> : null}
-      </Stack>
+        {placementError ? <FormHelperText id="placement-error" error>{placementError}</FormHelperText> : null}
+      </FormControl>
 
       <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
         <FormField name="budget.dailyCapCents" label="Daily budget cap (cents)" type="number" placeholder="5000" />

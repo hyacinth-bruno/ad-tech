@@ -3,7 +3,6 @@ import { validateCampaign, RoutingKey, type CampaignCreatedEvent, type CampaignS
 import { CampaignModel } from "../models/Campaign";
 import { publishEvent } from "../lib/rabbitmq";
 import { indexCampaign, removeCampaignFromIndex } from "../lib/algolia";
-import { generateCopySuggestions } from "../lib/aiCopy";
 import { logger } from "../lib/logger";
 
 export const campaignsRouter = Router();
@@ -53,6 +52,16 @@ campaignsRouter.get("/", async (req: Request, res: Response) => {
   return res.json(campaigns);
 });
 
+campaignsRouter.get("/categories", async (_req: Request, res: Response) => {
+  try {
+    const categories = await CampaignModel.distinct("targeting.categories", { status: "active" });
+    return res.json(categories.sort());
+  } catch (err) {
+    logger.error({ err }, "Active campaign categories lookup failed");
+    return res.status(503).json({ error: "categories_unavailable" });
+  }
+});
+
 campaignsRouter.get("/:id", async (req: Request, res: Response) => {
   const campaign = await CampaignModel.findById(req.params.id);
   if (!campaign) return res.status(404).json({ error: "not_found" });
@@ -95,31 +104,4 @@ campaignsRouter.post("/:id/status", async (req: Request, res: Response) => {
   }
 
   return res.json(campaign);
-});
-
-// ---- AI-assisted creative -------------------------------------------------
-
-campaignsRouter.post("/ai/copy-suggestions", async (req: Request, res: Response) => {
-  const { productName, advertiserName, categories, placements, tone } = req.body as {
-    productName?: string;
-    advertiserName?: string;
-    categories?: string[];
-    placements?: string[];
-    tone?: "direct" | "playful" | "premium";
-  };
-
-  if (!productName || !advertiserName || !categories?.length || !placements?.length) {
-    return res.status(422).json({
-      error: "validation_failed",
-      fields: { body: "productName, advertiserName, categories, and placements are required" },
-    });
-  }
-
-  try {
-    const result = await generateCopySuggestions({ productName, advertiserName, categories, placements, tone });
-    return res.json(result);
-  } catch (err) {
-    logger.error({ err }, "AI copy suggestion failed");
-    return res.status(502).json({ error: "ai_generation_failed" });
-  }
 });

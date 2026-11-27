@@ -53,6 +53,7 @@ serveRouter.get("/", async (req: Request, res: Response) => {
 
   return res.json({
     campaignId: served.objectID,
+    productSku: served.productSku,
     headline: served.headline,
     bodyCopy: served.bodyCopy,
     destinationUrl: served.destinationUrl,

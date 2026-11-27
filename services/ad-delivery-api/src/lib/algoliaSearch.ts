@@ -10,6 +10,7 @@ const index = client?.initIndex(indexName) ?? null;
 export interface AdCandidate {
   objectID: string;
   productName: string;
+  productSku: string;
   headline: string;
   bodyCopy: string;
   destinationUrl: string;
@@ -35,7 +36,7 @@ export async function findCandidates(query: CandidateQuery, hitsPerPage = 5): Pr
     return [];
   }
   const { hits } = await index.search<AdCandidate>(query.keyword ?? "", {
-    filters: `status:active AND categories:${query.category} AND placements:${query.placement}`,
+    filters: `status:active AND categories:${JSON.stringify(query.category)} AND placements:${JSON.stringify(query.placement)}`,
     hitsPerPage,
   });
   return hits;

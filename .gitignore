@@ -2,9 +2,15 @@ node_modules/
 dist/
 .next/
 *.log
-.env
-.env.local
+.env*
+!.env.example
 .DS_Store
 *.tsbuildinfo
 
 data/assets/
+services/campaign-api/data/assets/
+
+# Generated accessibility evidence and browser test reports
+artifacts/accessibility/
+apps/web/playwright-report/
+apps/web/test-results/

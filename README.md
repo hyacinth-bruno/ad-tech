@@ -1,10 +1,10 @@
 # Retail Media Demo
 
-A connected retail-media flow: build a sponsored-listing campaign with AI-assisted
-copy, and have it immediately eligible for real-time ad serving with frequency
-capping. Built to demonstrate the stack in a specific job description: Node.js/TS
+A connected retail-media flow: build a sponsored-listing campaign from catalog
+products and make it eligible for real-time ad serving with frequency capping.
+Built to demonstrate the stack in a specific job description: Node.js/TS
 microservices, Next.js (Pages Router) + Material-UI + Formik/JSON Schema, MongoDB,
-Redis, Algolia, BullMQ, RabbitMQ, and a genuinely shipped AI feature.
+Redis, Algolia, BullMQ and RabbitMQ.
 
 ## Why it's shaped this way
 
@@ -39,7 +39,7 @@ apps/web (Next.js Pages Router, MUI, Formik)
   ▼                                             ▼        ▼
 services/ad-delivery-api               services/campaign-api
   Algolia candidate lookup               MongoDB persistence
-  Redis frequency cap                    AI copy suggestions (Claude)
+  Redis frequency cap                    Product catalog and search
   BullMQ event enqueue                   Algolia indexing
         │                                       │
         ▼                                       ▼
@@ -60,7 +60,6 @@ Being direct about this because it matters more than it looks like it does:
 |---|---|
 | Shared JSON Schema + ajv validation | **Live-tested.** Unit tests run for real. |
 | `campaign-api` routes & validation | **Live-tested** with mocked Mongo/RabbitMQ/Algolia (standard practice — these are integration points, not logic under test). 8/8 passing. |
-| AI copy suggestions (`aiCopy.ts`) | **Live-tested** against a mocked Anthropic client, including the case where the model returns copy that violates the schema's length limits — those get filtered server-side before they ever reach the form. Wire in a real `ANTHROPIC_API_KEY` to hit the actual API. |
 | Redis frequency capping | **Live-tested against a real local Redis instance** — not a mock. This is the one piece where a fake client could hide a real bug (race conditions, TTL edge cases), so it's the one piece that gets the real thing. 5/5 passing. |
 | `ad-delivery-api` serve route | **Live-tested** with mocked Algolia results, real Redis for the capping logic. 5/5 passing. |
 | Next.js build | **Live-verified** — `next build` completes cleanly, all 3 pages (dashboard, wizard, live preview) generate. |
@@ -76,25 +75,188 @@ docker compose up -d          # mongo :27017, redis :6379, rabbitmq :5672 (+ UI 
 npm install
 npm run build:shared
 
-# 3. Env files (copy and fill in as needed — Algolia/Anthropic keys optional
+# 3. Env files (copy and fill in as needed — Algolia keys optional
 #    for campaign-api/ad-delivery-api to run, required for those features to work)
 cp services/campaign-api/.env.example services/campaign-api/.env
 cp services/ad-delivery-api/.env.example services/ad-delivery-api/.env
 cp services/worker/.env.example services/worker/.env
 cp apps/web/.env.example apps/web/.env.local
 
-# 4. Run everything (separate terminals)
+# 4. Move filled-in credentials into macOS Keychain
+npm run secrets:store -- --dry-run
+npm run secrets:store
+npm run secrets:status         # names only; never prints values
+
+# 5. Run everything (separate terminals)
 npm run dev:campaign-api      # :4001
 npm run dev:ad-delivery-api   # :4002
 npm run dev:worker
 npm run dev:web               # :3000
 ```
 
+### Local credentials in macOS Keychain
+
+Run `npm run secrets:store` after filling in the ignored local env files. It
+stores credential values in your default macOS Keychain under
+`com.northstar.retail-media-demo.credentials`, with separate accounts for
+`campaign-api`, `ad-delivery-api`, `worker` and `web`. Each write is read back and
+verified before any credential lines are removed from local env files. Re-running
+merges new values into the existing records. No credential is passed in process
+arguments, printed, or written to a temporary file. Non-secret settings remain
+editable in the env files.
+
+The root `dev:*`, `build:web`, `import:products` and `setup:storefront` commands
+load the appropriate Keychain record into the child process environment. Use
+`npm run build:web` to build the browser search UI with its public search key.
+Direct workspace commands bypass this loader; supply their environment variables
+yourself if you use them. On other operating systems and in CI, inject environment
+variables through your deployment platform's secret store.
+
+`npm run secrets:status` lists saved variable names only. If macOS requests access,
+allow the system `security` tool to use the login keychain. No unrestricted access
+rule is added. Keychain must be unlocked when starting the services.
+
+The `NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY` is a browser-visible search-only key;
+Keychain keeps it out of source control, not out of browser JavaScript. Restrict
+it to the required indices and search operations in Algolia. Admin keys stay in
+the server scopes and must never use a `NEXT_PUBLIC_` variable name. Example env
+files intentionally contain blank credential values. No keys are provisioned or
+rotated by these local scripts.
+
 Without an Algolia key, `ad-delivery-api`'s candidate lookup returns nothing
 and `/serve` always responds 204 — the frequency-capping and event-emission
-logic underneath it still runs and is still what's tested. Without an
-Anthropic key, the wizard's "Generate copy with AI" button will fail visibly
-and the form still works with manually typed copy.
+logic underneath it is covered by tests. Campaign copy can be filled from the
+catalog and edited in the campaign builder.
+
+## Import the 10,000-product sample catalog
+
+The campaign builder can search Algolia's [Best Buy sample dataset](https://github.com/algolia/datasets/tree/master/ecommerce).
+Products are stored separately from campaigns, in MongoDB's `products` collection
+and the Algolia `products` index. Selecting one in **New campaign → Find a catalog
+product** fills its brand, SKU, name, image, destination, categories and suggested
+copy. Review the details, enter targeting, budget and dates, then launch through
+the existing campaign flow. Importing products does not activate ads.
+
+In the final **Review & create** step, choose an initial status: Draft, Active,
+Paused or Ended. The final button reflects your choice, and the API saves that
+status in the creation request. Active remains the wizard default; API callers
+that omit status create a draft. You can change status later from its badge on
+the campaign dashboard.
+
+With MongoDB running and the existing `services/campaign-api/.env` configured:
+
+```bash
+npm run import:products -- --dry-run  # download and validate, without writes
+npm run import:products              # import all 10,000 and wait for Algolia indexing
+```
+
+`ALGOLIA_APP_ID` and `ALGOLIA_ADMIN_API_KEY` are required for the normal import.
+The optional `ALGOLIA_PRODUCTS_INDEX` defaults to `products`; it must differ
+from `ALGOLIA_CAMPAIGNS_INDEX` (default `campaigns`). The same campaign-api env
+file is used by the importer. Restart campaign-api if you change its env.
+
+The importer upserts in batches using stable source IDs. Re-running updates the
+same products without duplicating them or changing existing campaigns. If a batch
+fails, the command exits with an error; re-run it to finish synchronization.
+It does not remove products missing from a later source snapshot.
+
+Optional flags:
+
+```bash
+npm run import:products -- --limit 50                    # a smaller import
+npm run import:products -- --file /absolute/path/records.json
+npm run import:products -- --local-only                  # MongoDB only
+```
+
+Without Algolia credentials the catalog search API uses MongoDB. With credentials
+it searches the configured product index and reports outages visibly. The API is
+`GET /products?q=headphones&page=1&pageSize=20` with an optional exact `category`
+filter. Page size is at most 100 and pagination covers the first 10,000 results.
+`GET /campaigns/categories` supplies categories from active campaigns to the live
+preview, including names with spaces and punctuation.
+
+This is historical demo data, not current inventory or an affiliate feed. Product
+links and images can become unavailable; review them before launching. Stored
+prices are sample USD amounts and are not used as current prices in ad copy.
+
+## Northstar storefront and search studio
+
+Open [the storefront](http://localhost:3000/shop) or [search studio](http://localhost:3000/studio)
+after starting the demo services. The campaign console links to both.
+
+For a fresh installation, import the catalog and initialize federated search:
+
+```bash
+npm run import:products
+npm run setup:storefront
+```
+
+The setup command creates `<ALGOLIA_PRODUCTS_INDEX>_articles` with four original
+shopping guides and `<ALGOLIA_PRODUCTS_INDEX>_suggestions` with eight starter
+queries. It configures native custom ranking on the product index using the
+sample popularity score and valid 0–5 ratings. It preserves existing relevance
+configuration; later product imports also preserve searchable attribute order.
+These are sample scores, not measured sales or current review data. Additional
+indexes count toward the connected account's Algolia usage.
+
+The storefront implements:
+
+- Federated autocomplete across products, guides and suggestions, alongside
+  recent searches stored in the browser. Starter suggestions and measured
+  popular searches have distinct labels. Keyboard arrows, Tab, Enter and Escape
+  work in the search dropdown.
+- Native Algolia typo tolerance, relevance, category/brand facets, numeric price
+  filters and pagination. Query parameters preserve searches and filters in URLs.
+- Product detail pages, readable guide pages, a persistent browser cart and an
+  idempotent **demo checkout**. The server validates quantities and uses its own
+  catalog prices. No payment, fulfillment or stock verification is implemented.
+- Existing ad-delivery integration for search, category and product-detail
+  placements. Only matching active campaigns appear, labeled Sponsored. Ad
+  impressions/clicks retain the existing Redis frequency caps and event queue.
+
+In search studio, Overview shows persisted storefront activity for a rolling 7
+or 30 days in UTC. Rates count searches with at least one attributed action,
+divided by searches. Revenue/AOV use completed demo orders with sample USD prices;
+category revenue/AOV include only attributed line items in that category.
+Autocomplete, recommendations and studio previews do not inflate these metrics.
+The panel includes no-results queries, top searches, top products, category
+breakdowns and Insights delivery counts. Empty periods display zero activity.
+
+Merchandising publishes **real Algolia Rules**: set a query, optionally filter a
+category, select products and order their promotions. Enable, disable or remove
+rules without importing the catalog again. Only rules prefixed `store-` are
+managed here; other existing rules are preserved. Relevance changes the native
+searchable attribute order and custom tie-breakers. Studio writes accept only
+loopback requests from the local demo origin; add authentication before exposing
+this application beyond local development.
+
+Searches request `clickAnalytics` and send a persistent anonymous `userToken`.
+The server verifies search-to-product attribution and records absolute positions
+before forwarding view/click/add-to-cart/purchase events to Algolia Insights.
+It saves delivery status so temporary failures are visible and can be retried in
+the studio. Use a dedicated search-scoped `ALGOLIA_INSIGHTS_API_KEY` if desired;
+otherwise the existing server-side key is used. No Algolia admin key reaches the
+browser. Algolia searches are tagged `northstar-storefront` for its own analytics.
+Popular suggestions can be synced from measured top queries in the studio.
+
+### Native AI features: activation required
+
+These integrations are wired; this repository does not train substitute models
+or change the Algolia account's subscription:
+
+| Feature | Required Algolia setup | Demo configuration |
+|---|---|---|
+| Personalization | Activate/configure brand and category affinities and event weights in the dashboard. | Set `ALGOLIA_PERSONALIZATION_ENABLED=true`, restart campaign-api. Searches send `enablePersonalization` and the same anonymous token used by events. |
+| Dynamic Re-Ranking | Activate the model and collect sufficient click/conversion traffic. | Set `ALGOLIA_RERANKING_ENABLED=true`, restart campaign-api. Searches send `enableReRanking`. |
+| Query Categorization | Configure category predictions plus automatic boosting/filtering in Algolia. | Native engine configuration applies automatically. Set `ALGOLIA_QUERY_CATEGORIZATION_ENABLED=true` after activation to reflect setup status in the studio. Search responses retain native prediction metadata. |
+| NeuralSearch | Activate the semantic model and set the product index's native `mode` to `neuralSearch`. | The storefront follows index mode and sends natural-language queries unchanged. Until activation it uses keyword search. |
+
+Configuration flags indicate requested integration behavior, not proof that a
+model has trained or changed a particular result. Search studio labels this
+explicitly. Official references: [personalization](https://www.algolia.com/doc/api-reference/api-parameters/enablePersonalization),
+[Dynamic Re-Ranking](https://www.algolia.com/doc/api-reference/api-parameters/enableReRanking),
+[Query Categorization](https://www.algolia.com/products/features/query-categorization),
+[NeuralSearch mode](https://www.algolia.com/doc/api-reference/api-parameters/mode).
 
 ## Running the tests
 
@@ -111,19 +273,15 @@ covers that, or a local `redis-server`.
 - `ad-delivery-api` would want a read replica or Redis Cluster once traffic
   is real, and the Algolia lookup would move to server-side rendering or an
   edge function to shave the extra network hop.
-- `campaign-api`'s AI endpoint should queue longer-running generations
-  through BullMQ too, rather than block the HTTP request, once copy
-  generation includes multi-turn refinement.
 - The worker's RabbitMQ consumer currently just logs; in production it's
   where you'd hang cache warming, Slack notifications for high-budget
   launches, or a search-index consistency check.
 
-### Create ads from photos in Codex (no Claude key)
+### Create ads from photos in Codex
 
 The local plugin in `plugins/retail-media` lets Codex write copy itself and save
-campaigns through MCP. This workflow does not call Anthropic or require an OpenAI
-API key in the app; it uses your existing Codex session. The older website AI-copy
-button still uses the optional Anthropic integration.
+campaigns through MCP using your existing Codex session. No separate model API
+key is required in the application.
 
 1. Start the demo services using the instructions above, including campaign-api
    on port 4001 and the website on port 3000.
@@ -166,3 +324,77 @@ it is excluded from Git. There is no automatic image deletion or cloud storage.
 
 Verify the bridge with `npm test --prefix plugins/retail-media`; run the API tests
 with `npm test -w services/campaign-api`.
+
+## Accessibility checks
+
+The web app includes Playwright + axe-core regression tests covering WCAG 2 A/AA,
+2.1 A/AA, 2.2 AA and axe best-practice checks. No rules in that scope are disabled and no application regions are excluded. Desktop (1440 px) and mobile (390 px) projects cover the
+console, all campaign wizard steps, validation errors, the product picker,
+preview, all search studio tabs, storefront search, product detail, cart and guides.
+Additional assertions check keyboard navigation, skip links, focus restoration,
+focus not being covered by the sticky header, readable step/placeholder contrast,
+and 320 px reflow with increased text spacing.
+
+With the campaign API, ad-delivery API and their backing services running:
+
+```bash
+npm install
+npx playwright install chromium
+npm run test:a11y
+```
+
+The test runner starts the web app if needed and reuses a running local server.
+`PLAYWRIGHT_BASE_URL` can select another local web address. To reuse a compatible
+installed Chromium binary, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its full
+executable path. Standard Playwright browser installation is recommended for CI.
+
+The HTML test report is saved under `apps/web/playwright-report`; screenshots,
+axe JSON and failure traces are attached to test results. The current audit's
+before/after screenshots and JSON are saved locally in `artifacts/accessibility`.
+Generated reports are excluded from Git. Tests stop at campaign review and do
+not publish campaigns or collect payments. The preview's served-ad test uses an
+explicit delivery fixture; other main-flow accessibility checks use the live
+catalog/API. Cart tests record normal demo cart events.
+
+These checks prevent common regressions but do not certify complete WCAG
+conformance. Screen-reader testing with assistive-technology users, browser/OS
+coverage and ongoing content review remain necessary. See
+[Playwright's accessibility testing guidance](https://playwright.dev/docs/accessibility-testing).
+
+### Campaign search with React InstantSearch
+
+Open **Campaigns** (`/`) and use the search box under **Your campaigns**. This searches the Algolia `campaigns` index directly using the
+search-only browser key. The existing `/shop` catalog search remains separate.
+
+Configure these public values in `apps/web/.env.local` (also documented in
+`apps/web/.env.example`), then restart the web server:
+
+```dotenv
+NEXT_PUBLIC_ALGOLIA_APP_ID=your-application-id
+NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=your-search-only-key
+NEXT_PUBLIC_ALGOLIA_INDEX_NAME=campaigns
+```
+
+The integration uses `algoliasearch/lite` v5 and React InstantSearch v7's built-in
+`Autocomplete` widget, rather than `@algolia/autocomplete-js`. Suggestions include
+campaign images, product names and headlines; the paginated results also show
+body copy with highlighted snippets. Enter or select a suggestion to update the
+results. URLs such as `/?q=camera&page=2` can be shared and reloaded.
+Mobile uses the widget's detached search overlay, styled to match Northstar.
+
+Results are server-rendered through `getServerState` and
+`InstantSearchSSRProvider`. The responsive autocomplete is loaded on the client
+because its initial matchMedia-based layout differs between server and mobile;
+a hidden built-in SearchBox keeps the query registered during SSR. No separate
+Query Suggestions index is required. Insights is enabled for InstantSearch.
+
+This is campaign-library search, so it displays every record permitted by the
+search key, including any drafts already in the index. It is not a substitute
+for the ad-delivery service's eligibility checks. Use index-restricted search
+keys and a public-only index if exposing the experience outside the workspace.
+The backend services continue using their existing v4 Algolia client.
+
+Campaign search is embedded in the dashboard. Empty queries show the existing
+recent-campaign cards and status controls. Submitted queries show Algolia results,
+and status tabs filter both results and suggestions. Legacy `/search` links
+redirect to Campaigns while retaining query and pagination parameters.
