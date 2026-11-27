@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Stack, Typography, Card, Chip, Box, Skeleton, Alert, Button, TextField, InputAdornment, Tab, Tabs, Divider } from "@mui/material";
+import { Stack, Typography, Card, Chip, Box, Skeleton, Alert, Button, Tab, Tabs, Divider } from "@mui/material";
 import Link from "next/link";
-import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
@@ -14,14 +13,21 @@ import { CampaignStatusControl } from "@/components/console/CampaignStatusContro
 import { CampaignCreative, ConsoleHeading, ConsoleStat } from "@/components/console/ConsoleComponents";
 import { northstar } from "@/lib/theme";
 
+import type { GetServerSideProps } from "next";
+import { getServerState, type InstantSearchServerState } from "react-instantsearch";
+import { renderToString } from "react-dom/server";
+import { CampaignSearch } from "@/components/search/CampaignSearch";
+import { campaignSearchClient } from "@/lib/campaignSearch";
+
+type SearchProps = { url: string; serverState?: InstantSearchServerState; initialError?: boolean };
 const euro = (cents: number) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(cents / 100);
 const statuses = ["all", "active", "draft", "paused", "ended"];
 const placementNames: Record<string, string> = { search: "Search", category: "Category", pdp: "Product page" };
 const campaignId = (campaign: Campaign) => campaign.id ?? (campaign as unknown as { _id: string })._id;
-export default function DashboardPage() {
+export default function DashboardPage(searchProps: SearchProps) {
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState("all"), [query, setQuery] = useState("");
+  const [status, setStatus] = useState("all");
   const [notice, setNotice] = useState("");
   const mutationVersion = useRef(0), pendingUpdates = useRef(0);
   useEffect(() => {
@@ -51,7 +57,7 @@ export default function DashboardPage() {
       mutationVersion.current++;
     }
   }
-  const shown = campaigns?.filter((c) => (status === "all" || c.status === status) && `${c.productName} ${c.headline} ${c.advertiserName} ${c.productSku}`.toLowerCase().includes(query.toLowerCase()));
+  const shown = campaigns?.filter((c) => (status === "all" || c.status === status));
   const categories = new Set(campaigns?.flatMap((c) => c.targeting?.categories ?? []));
   return <Stack gap={3.5}>
     <ConsoleHeading eyebrow="YOUR RETAIL MEDIA WORKSPACE" title="A place for your next big idea." description="Turn products into discoveries. Create, review and bring your campaigns to the storefront." action={<Button component={Link} href="/campaigns/new" variant="contained" startIcon={<AddIcon />} sx={{ alignSelf: { xs: "flex-start", sm: "auto" }, whiteSpace: "nowrap" }}>New campaign</Button>} />
@@ -63,14 +69,15 @@ export default function DashboardPage() {
     </Box>
     <Box sx={{ bgcolor: northstar.soft, border: `1px solid ${northstar.border}`, borderRadius: 3, p: { xs: 2.5, sm: 3 }, display: "flex", alignItems: "center", gap: 2.5 }}><Box sx={{ fontSize: 40, color: "#789153", display: { xs: "none", sm: "block" }, lineHeight: 1 }} aria-hidden="true">✳</Box><Box flex={1}><Typography variant="subtitle2" fontWeight={600}>Good products. A story worth sharing.</Typography><Typography variant="body2" color="text.secondary" fontSize={12} mt={0.5}>Start with a product from your catalog, then make the campaign your own.</Typography></Box><Button component={Link} href="/shop" endIcon={<ArrowOutwardIcon />} sx={{ whiteSpace: "nowrap", fontSize: 11, display: { xs: "none", sm: "inline-flex" } }}>Explore the collection</Button></Box>
     <Stack gap={2}>
-      <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems={{ sm: "center" }} justifyContent="space-between"><Box><Typography variant="h5" component="h2">Your campaigns</Typography><Typography role="status" variant="caption" color="text.secondary">{campaigns ? `${shown?.length ?? 0} ${shown?.length === 1 ? "campaign" : "campaigns"} in this view` : "Loading your workspace…"}</Typography></Box><TextField size="small" label="Search campaigns" placeholder="Product, brand or SKU" value={query} onChange={(e) => setQuery(e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }} sx={{ width: { xs: "100%", sm: 285 } }} /></Stack>
-      <Tabs value={status} onChange={(_, value) => setStatus(value)} variant="scrollable" scrollButtons="auto" aria-label="Filter campaigns by status">{statuses.map((s) => <Tab key={s} id={`campaign-tab-${s}`} aria-controls="campaign-results" value={s} label={`${s === "all" ? "All campaigns" : s[0].toUpperCase() + s.slice(1)}${campaigns ? ` (${s === "all" ? campaigns.length : campaigns.filter((c) => c.status === s).length})` : ""}`} />)}</Tabs>
+      <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems={{ sm: "center" }} justifyContent="space-between"><Box><Typography variant="h5" component="h2">Your campaigns</Typography><Typography role="status" variant="caption" color="text.secondary">{campaigns ? `${shown?.length ?? 0} ${shown?.length === 1 ? "campaign" : "campaigns"} in the recent campaign list` : "Loading your workspace…"}</Typography></Box></Stack>
+
     </Stack>
+    <CampaignSearch {...searchProps} statusFilter={status} toolbar={<Tabs value={status} onChange={(_, value) => setStatus(value)} variant="scrollable" scrollButtons="auto" aria-label="Filter campaigns by status">{statuses.map((s) => <Tab key={s} id={`campaign-tab-${s}`} aria-controls="campaign-results" value={s} label={`${s === "all" ? "All campaigns" : s[0].toUpperCase() + s.slice(1)}${campaigns ? ` (${s === "all" ? campaigns.length : campaigns.filter((c) => c.status === s).length})` : ""}`} />)}</Tabs>} defaultContent={
     <Box role="tabpanel" id="campaign-results" aria-labelledby={`campaign-tab-${status}`} tabIndex={0}>
     <Box role="status" aria-atomic="true">{notice && <Alert severity="success" role="presentation" sx={{ mb: 2 }}>{notice}</Alert>}</Box>
     {error && <Alert severity="warning">{error}</Alert>}
     {!campaigns && !error && <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: "repeat(3,1fr)" }, gap: 2.5 }}>{[0, 1, 2].map((i) => <Skeleton key={i} variant="rounded" height={420} />)}</Box>}
-    {campaigns && shown?.length === 0 && <Card sx={{ py: 7, px: 3, textAlign: "center", borderStyle: "dashed" }}><Typography sx={{ color: "#8ca171", fontSize: 48 }} aria-hidden="true">✳</Typography><Typography variant="h5" component="h3" mt={1}>{campaigns.length ? "A little too specific?" : "Your next campaign starts here."}</Typography><Typography variant="body2" color="text.secondary" my={2}>{campaigns.length ? "Try another search or a different status." : "Choose a product, add your story and find your audience."}</Typography>{campaigns.length ? <Button onClick={() => { setQuery(""); setStatus("all"); }}>Clear filters</Button> : <Button component={Link} href="/campaigns/new" variant="contained">Create your first campaign</Button>}</Card>}
+    {campaigns && shown?.length === 0 && <Card sx={{ py: 7, px: 3, textAlign: "center", borderStyle: "dashed" }}><Typography sx={{ color: "#8ca171", fontSize: 48 }} aria-hidden="true">✳</Typography><Typography variant="h5" component="h3" mt={1}>{campaigns.length ? "A little too specific?" : "Your next campaign starts here."}</Typography><Typography variant="body2" color="text.secondary" my={2}>{campaigns.length ? "Try another search or a different status." : "Choose a product, add your story and find your audience."}</Typography>{campaigns.length ? <Button onClick={() => { setStatus("all"); }}>Clear filters</Button> : <Button component={Link} href="/campaigns/new" variant="contained">Create your first campaign</Button>}</Card>}
     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0,1fr)", sm: "repeat(2,minmax(0,1fr))", md: "repeat(3,minmax(0,1fr))" }, gap: 2.5 }}>
       {shown?.map((c) => <Card key={campaignId(c)} sx={{ minWidth: 0, display: "flex", flexDirection: "column", transition: "border-color .2s", "&:hover": { borderColor: "#a6b993" } }}>
         <Box sx={{ px: 2.5, pt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}><Typography variant="caption" color="text.secondary" fontSize={9} sx={{ letterSpacing: ".05em" }}>{c.productSku}</Typography><CampaignStatusControl campaign={c} onChange={(nextStatus) => updateStatus(c, nextStatus)} /></Box>
@@ -79,5 +86,17 @@ export default function DashboardPage() {
       </Card>)}
     </Box>
     </Box>
+    } />
   </Stack>;
 }
+
+export const getServerSideProps: GetServerSideProps<SearchProps> = async ({ resolvedUrl }) => {
+  const url = `http://localhost${resolvedUrl}`;
+  if (!campaignSearchClient) return { props: { url } };
+  try {
+    const serverState = await getServerState(<DashboardPage url={url} />, { renderToString });
+    return { props: { url, serverState } };
+  } catch {
+    return { props: { url, initialError: true } };
+  }
+};

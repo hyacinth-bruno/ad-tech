@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import "@/styles/globals.css";
+import "@/styles/campaign-search.css";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme, shopTheme } from "@/lib/theme";
 import { AppShell } from "@/components/AppShell";

@@ -82,12 +82,46 @@ cp services/ad-delivery-api/.env.example services/ad-delivery-api/.env
 cp services/worker/.env.example services/worker/.env
 cp apps/web/.env.example apps/web/.env.local
 
-# 4. Run everything (separate terminals)
+# 4. Move filled-in credentials into macOS Keychain
+npm run secrets:store -- --dry-run
+npm run secrets:store
+npm run secrets:status         # names only; never prints values
+
+# 5. Run everything (separate terminals)
 npm run dev:campaign-api      # :4001
 npm run dev:ad-delivery-api   # :4002
 npm run dev:worker
 npm run dev:web               # :3000
 ```
+
+### Local credentials in macOS Keychain
+
+Run `npm run secrets:store` after filling in the ignored local env files. It
+stores credential values in your default macOS Keychain under
+`com.northstar.retail-media-demo.credentials`, with separate accounts for
+`campaign-api`, `ad-delivery-api`, `worker` and `web`. Each write is read back and
+verified before any credential lines are removed from local env files. Re-running
+merges new values into the existing records. No credential is passed in process
+arguments, printed, or written to a temporary file. Non-secret settings remain
+editable in the env files.
+
+The root `dev:*`, `build:web`, `import:products` and `setup:storefront` commands
+load the appropriate Keychain record into the child process environment. Use
+`npm run build:web` to build the browser search UI with its public search key.
+Direct workspace commands bypass this loader; supply their environment variables
+yourself if you use them. On other operating systems and in CI, inject environment
+variables through your deployment platform's secret store.
+
+`npm run secrets:status` lists saved variable names only. If macOS requests access,
+allow the system `security` tool to use the login keychain. No unrestricted access
+rule is added. Keychain must be unlocked when starting the services.
+
+The `NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY` is a browser-visible search-only key;
+Keychain keeps it out of source control, not out of browser JavaScript. Restrict
+it to the required indices and search operations in Algolia. Admin keys stay in
+the server scopes and must never use a `NEXT_PUBLIC_` variable name. Example env
+files intentionally contain blank credential values. No keys are provisioned or
+rotated by these local scripts.
 
 Without an Algolia key, `ad-delivery-api`'s candidate lookup returns nothing
 and `/serve` always responds 204 — the frequency-capping and event-emission
@@ -326,3 +360,41 @@ These checks prevent common regressions but do not certify complete WCAG
 conformance. Screen-reader testing with assistive-technology users, browser/OS
 coverage and ongoing content review remain necessary. See
 [Playwright's accessibility testing guidance](https://playwright.dev/docs/accessibility-testing).
+
+### Campaign search with React InstantSearch
+
+Open **Campaigns** (`/`) and use the search box under **Your campaigns**. This searches the Algolia `campaigns` index directly using the
+search-only browser key. The existing `/shop` catalog search remains separate.
+
+Configure these public values in `apps/web/.env.local` (also documented in
+`apps/web/.env.example`), then restart the web server:
+
+```dotenv
+NEXT_PUBLIC_ALGOLIA_APP_ID=your-application-id
+NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=your-search-only-key
+NEXT_PUBLIC_ALGOLIA_INDEX_NAME=campaigns
+```
+
+The integration uses `algoliasearch/lite` v5 and React InstantSearch v7's built-in
+`Autocomplete` widget, rather than `@algolia/autocomplete-js`. Suggestions include
+campaign images, product names and headlines; the paginated results also show
+body copy with highlighted snippets. Enter or select a suggestion to update the
+results. URLs such as `/?q=camera&page=2` can be shared and reloaded.
+Mobile uses the widget's detached search overlay, styled to match Northstar.
+
+Results are server-rendered through `getServerState` and
+`InstantSearchSSRProvider`. The responsive autocomplete is loaded on the client
+because its initial matchMedia-based layout differs between server and mobile;
+a hidden built-in SearchBox keeps the query registered during SSR. No separate
+Query Suggestions index is required. Insights is enabled for InstantSearch.
+
+This is campaign-library search, so it displays every record permitted by the
+search key, including any drafts already in the index. It is not a substitute
+for the ad-delivery service's eligibility checks. Use index-restricted search
+keys and a public-only index if exposing the experience outside the workspace.
+The backend services continue using their existing v4 Algolia client.
+
+Campaign search is embedded in the dashboard. Empty queries show the existing
+recent-campaign cards and status controls. Submitted queries show Algolia results,
+and status tabs filter both results and suggestions. Legacy `/search` links
+redirect to Campaigns while retaining query and pagination parameters.
